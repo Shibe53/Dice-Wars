@@ -118,14 +118,41 @@ public class DiceWars {
             cells[enemyRow][enemyCol].setDiceNumber(playerDice - 1);
             cells[enemyRow][enemyCol].setIsPlayer(true);
             DicePanel.setEnemyTerritories(DicePanel.getEnemyTerritories() - 1);
+            playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
+            enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
         }
         cells[attackingRow][attackingCol].setDiceNumber(1);
         cells[attackingRow][attackingCol].number.setForeground(Color.WHITE);
-        playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
-        enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
         attackingState = false;
         if (DicePanel.getEnemyTerritories() == 0) {
             win();
+        }
+    }
+
+    public static void attackAI(int attackedRow, int attackedCol) {
+        int enemyRolls = 0;
+        int playerRolls = 0;
+        int playerDice = cells[attackedRow][attackedCol].getDiceNumber();
+        int enemyDice = cells[attackingRow][attackingCol].getDiceNumber();
+        for (int i = 0; i < enemyDice; i++) {
+            enemyRolls += randomizer.nextInt(6) + 1;
+        }
+        for (int i = 0; i < playerDice; i++) {
+            playerRolls += randomizer.nextInt(6) + 1;
+        }
+
+        if (enemyRolls > playerRolls) {
+            cells[attackedRow][attackedCol].setDiceNumber(enemyDice - 1);
+            cells[attackedRow][attackedCol].setIsPlayer(false);
+            DicePanel.setPlayerTerritories(DicePanel.getPlayerTerritories() - 1);
+            playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
+            enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
+        }
+        cells[attackingRow][attackingCol].setDiceNumber(1);
+        //cells[attackingRow][attackingCol].number.setForeground(Color.WHITE);
+        attackingState = false;
+        if (DicePanel.getPlayerTerritories() == 0) {
+            lose();
         }
     }
 
@@ -166,8 +193,55 @@ public class DiceWars {
         }
     }
 
+    public void endTurnAI() {
+        int newDice = DicePanel.getEnemyTerritories();
+        boolean full = false;
+        end.setEnabled(true);
+
+        while (newDice > 0 && !full) {
+            full = true;
+            for (int i = 0; i < DicePanel.ROWS; i++) {
+                for (int j = 0; j < DicePanel.COLUMNS; j++) {
+                    if (!cells[i][j].getIsPlayer() && cells[i][j].getDiceNumber() < 8) {
+                        int randDice = randomizer.nextInt(4);
+                        full = false;
+                        if (randomizer.nextInt(3) != 0) {
+                            continue;
+                        }
+
+                        if (randDice > newDice) {
+                            cells[i][j].setDiceNumber(cells[i][j].getDiceNumber() + newDice);
+                            if (cells[i][j].getDiceNumber() > 8) {
+                                cells[i][j].setDiceNumber(8);
+                            }
+                            newDice = 0;
+                        } else {
+                            if (cells[i][j].getDiceNumber() + randDice > 8) {
+                                cells[i][j].setDiceNumber(8);
+                                newDice -= 8 - cells[i][j].getDiceNumber();
+                            } else {
+                                cells[i][j].setDiceNumber(cells[i][j].getDiceNumber() + randDice);
+                                newDice -= randDice;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void aiTurn() {
+        while (true) {
+            // TODO
+        }
+    }
+
     static void win() {
         System.out.println("You won :)");
+    }
+
+    static void lose() {
+        System.out.println("You lost :(");
     }
 
     public static void main(String[] args) {
