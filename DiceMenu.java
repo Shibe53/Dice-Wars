@@ -1,5 +1,5 @@
 import javax.swing.*;
 
-public class DiceMenu {
+public class DiceMenu extends JPanel {
     
 }
