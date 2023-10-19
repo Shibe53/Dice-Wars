@@ -110,6 +110,10 @@ public class DiceWars {
         return gameStarted;
     }
 
+    public static void setAttackState(boolean state) {
+        attackingState = state;
+    }
+
     public static void setAttackState(boolean state, int row, int col) {
         attackingState = state;
         attackingCol = col;
@@ -295,18 +299,19 @@ public class DiceWars {
 
                         if (cells[i][j].getDiceNumber() >= min) {
                             attackableNeighbour = true;
+
                             cells[minI][minJ].setBackground(new Color(119, 82, 168));
                             cells[i][j].setBackground(new Color(121, 204, 88));
 
                             // TODO: swing timer thingy ~1000ms
 
                             attackAI(i, j, minI, minJ);
+
                             cells[i][j].setBackground(new Color(61, 153, 49));
                             if (cells[minI][minJ].getIsPlayer()) {
                                 cells[minI][minJ].setBackground(new Color(100, 50, 168));
                             }
 
-                            // TODO: swing timer thingy ~1000ms
                         }
                     }
                 }

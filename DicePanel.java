@@ -147,6 +147,10 @@ class CellPanel extends JPanel {
                     number.setForeground(Color.PINK);
                 } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
                     DiceWars.attack(row, col);
+                } else if (DiceWars.getAttackState() && row == DiceWars.attackingRow 
+                    && col == DiceWars.attackingCol) {
+                    DiceWars.setAttackState(false);
+                    number.setForeground(Color.WHITE);
                 }
             }
         }
@@ -155,7 +159,9 @@ class CellPanel extends JPanel {
         public void mouseEntered(MouseEvent e) {
             if (DiceWars.getGameStarted()) {
                 defaultBackground = getBackground();
-                if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
+                if ((isPlayer && !DiceWars.getAttackState() && dice > 1) 
+                    || (DiceWars.getAttackState() && row == DiceWars.attackingRow 
+                    && col == DiceWars.attackingCol)) {
                     setBackground(new Color(119, 82, 168));
                     setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
