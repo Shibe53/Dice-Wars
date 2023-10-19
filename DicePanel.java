@@ -4,6 +4,9 @@ import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
 
+/**
+ * Class for the main panel of the application: the game area.
+ */
 public class DicePanel extends JPanel {
 
     static final int ROWS = 6;
@@ -15,6 +18,9 @@ public class DicePanel extends JPanel {
     Random randomizer = new Random();
     GridBagConstraints gbc = new GridBagConstraints();
 
+    /**
+     * Constructor for the DicePanel class.
+     */
     public DicePanel() {
         setLayout(new GridBagLayout());
         setBackground(Color.GRAY);
@@ -50,6 +56,12 @@ public class DicePanel extends JPanel {
         return enemyTerritories;
     }
 
+    /**
+     * Generates a grid made of CellPanels the represent territories.
+     * 
+     * The territories are randomly (and fairly) assigned to either the player or the opponent.
+     * Each territory has a random number of dice, from 1 to 4.s
+     */
     public void generateMap() {
         playerTerritories = 0;
         enemyTerritories = 0;
@@ -81,6 +93,9 @@ public class DicePanel extends JPanel {
     }
 }
 
+/**
+ * Panel for every cell in the grid.
+ */
 class CellPanel extends JPanel {
 
     private Color defaultBackground;
@@ -92,6 +107,12 @@ class CellPanel extends JPanel {
     MyListener mouse = new MyListener();
     JLabel number = new JLabel(String.valueOf(dice), JLabel.CENTER);
 
+    /**
+     * Constructor for CellPanel.
+     * 
+     * @param r  row of the cell in the grid
+     * @param c  column of the cell in the grid
+     */
     public CellPanel(int r, int c) {
         row = r;
         col = c;
@@ -103,6 +124,11 @@ class CellPanel extends JPanel {
         addMouseListener(mouse);
     }
 
+    /**
+     * Changes the dice value of the current CellPanel.
+     * 
+     * @param value  new dice number
+     */
     public void setDiceNumber(int value) {
         dice = value;
         number.setText(String.valueOf(dice));
@@ -112,6 +138,11 @@ class CellPanel extends JPanel {
         return dice;
     }
 
+    /**
+     * Changes if the territory belongs to the player or the opponent.
+     * 
+     * @param is  true if it belongs to the player, false if to the opponent
+     */
     public void setIsPlayer(boolean is) {
         isPlayer = is;
         if (isPlayer) {

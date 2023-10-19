@@ -3,16 +3,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.lang.Math;
 import java.util.Random;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+/**
+ * Main class for the application: creates the JFrame and most of the Swing components.
+ * It contains the main method.
+ */
 public class DiceWars {
 
     static JFrame frame = new JFrame("Dice Wars");
-    static ImageIcon icon = new ImageIcon("icon.png");
+    static ImageIcon icon = new ImageIcon("dice_icon.png");
     DicePanel panel = new DicePanel();
     static JButton end = new JButton("Play");
     static JButton reroll = new JButton("Reroll map");
@@ -26,6 +34,9 @@ public class DiceWars {
     static int attackingCol = 0;
     static CellPanel[][] cells;
 
+    /**
+     * Constructor for the DiceWars class.
+     */
     public DiceWars() {
 
         SwingUtilities.invokeLater(() -> {
@@ -60,6 +71,7 @@ public class DiceWars {
                         if (randomizer.nextInt(2) == 0) {
                             aiTurn();
                         }
+                        playSound(new File("dice_roll.wav"), false);
                     }
                 }
             });
@@ -102,6 +114,8 @@ public class DiceWars {
             frame.setResizable(false);
             frame.setVisible(true);
 
+            playSound(new File("dice_menu.wav"), true);
+
             cells = panel.getCellMatrix();
         });
     }
@@ -114,6 +128,14 @@ public class DiceWars {
         attackingState = state;
     }
 
+    /**
+     * Changes the variables attackingState, attackingRow and attackingCol
+     * depending on the given parameters.
+     * 
+     * @param state  state (attack or not)
+     * @param row    attacking row
+     * @param col    attacking column
+     */
     public static void setAttackState(boolean state, int row, int col) {
         attackingState = state;
         attackingCol = col;
@@ -124,6 +146,14 @@ public class DiceWars {
         return attackingState;
     }
 
+    /**
+     * Checks if the cell that is hovered over can be attacked,
+     * depending on which cell the player is attacking with.
+     * 
+     * @param enemyRow  row of the cell that is trying to be attacked
+     * @param enemyCol  column of the cell that is trying to be attacked
+     * @return          true if it can be attacked, false if not
+     */
     public static boolean canAttack(int enemyRow, int enemyCol) {
         if (Math.abs(attackingCol - enemyCol) <= 1 && Math.abs(attackingRow - enemyRow) <= 1) {
             return true;
@@ -131,6 +161,13 @@ public class DiceWars {
         return false;
     }
 
+    /**
+     * Attacks a cell, using the coordinates of the cell that entered the attacking state.
+     * This is a method for the player's attack.
+     * 
+     * @param enemyRow  row of the cell that is being attacked
+     * @param enemyCol  column of the cell that is being attacked
+     */
     public static void attack(int enemyRow, int enemyCol) {
 
         int enemyRolls = 0;
@@ -161,6 +198,15 @@ public class DiceWars {
         }
     }
 
+    /**
+     * Attacks a cell, using the coordinates given through the parameters.
+     * This is a method for the AI's attack.
+     * 
+     * @param attackingRow  row of attacking cell
+     * @param attackingCol  column of attacking cell
+     * @param attackedRow   row of attacked cell
+     * @param attackedCol   column of attacked cell
+     */
     public static void attackAI(int attackingRow, int attackingCol,
         int attackedRow, int attackedCol) {
 
@@ -185,7 +231,6 @@ public class DiceWars {
             enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
         }
         cells[attackingRow][attackingCol].setDiceNumber(1);
-        //cells[attackingRow][attackingCol].number.setForeground(Color.WHITE);
         attackingState = false;
         frame.pack();
         frame.setLocationRelativeTo(null);
@@ -194,6 +239,10 @@ public class DiceWars {
         }
     }
 
+    /**
+     * End the player's turn, randomly assigning new dice throughout their territories.
+     * Number of dice is based on player-controlled territories.
+     */
     public void endTurn() {
         int newDice = DicePanel.getPlayerTerritories();
         boolean full = false;
@@ -230,9 +279,14 @@ public class DiceWars {
             }
         }
 
+        // Starts the AI's turn
         aiTurn();
     }
 
+    /**
+     * End the AI's turn, randomly assigning new dice throughout their territories.
+     * Number of dice is based on AI-controlled territories.
+     */
     public void endTurnAI() {
         int newDice = DicePanel.getEnemyTerritories();
         boolean full = false;
@@ -270,6 +324,12 @@ public class DiceWars {
         }
     }
 
+    /**
+     * The AI's logic system: how the AI decides which territory to attack.
+     * 
+     * Current implementation: checks player-controlled neighbours, attacks lowest
+     * dice number that is smaller or equal to the attacking cell's dice number.
+     */
     public void aiTurn() {
 
         boolean attackableNeighbour = true;
@@ -327,6 +387,28 @@ public class DiceWars {
 
     static void lose() {
         System.out.println("You lost :(");
+    }
+
+    /**
+     * Plays the .wav sound file given as parameter.
+     * 
+     * @param file  sound file (.wav)
+     * @param loop  true if the sound loops, false otherwise
+     */
+    public void playSound(File file, boolean loop) {
+        try {
+            AudioInputStream audioInputStream = 
+                AudioSystem.getAudioInputStream(file.getAbsoluteFile());
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioInputStream);
+            if (loop) {
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            } else {
+                clip.start();
+            }
+        } catch (Exception ex) {
+            throw new UnsupportedOperationException("Can't play audio :(");
+        }
     }
 
     public static void main(String[] args) {
