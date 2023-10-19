@@ -14,12 +14,14 @@ public class DiceWars {
     static JFrame frame = new JFrame("Dice Wars");
     static ImageIcon icon = new ImageIcon("icon.png");
     DicePanel panel = new DicePanel();
-    static JButton end = new JButton("END TURN");
+    static JButton end = new JButton("Play");
+    static JButton reroll = new JButton("Reroll map");
     static JLabel playerScore = new JLabel("0", JLabel.CENTER);
     static JLabel enemyScore = new JLabel("0", JLabel.CENTER);
 
     static Random randomizer = new Random();
     static boolean attackingState = false;
+    static boolean gameStarted = false;
     static int attackingRow = 0;
     static int attackingCol = 0;
     static CellPanel[][] cells;
@@ -39,14 +41,26 @@ public class DiceWars {
             enemyScore.setForeground(new Color(61, 138, 30));
             enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
 
-            end.setFont(new Font("Serif", Font.BOLD, 28));
+            end.setFont(new Font("Georgia", Font.BOLD, 36));
+            end.setBorder(new EmptyBorder(5, 5, 5, 5));
             end.setBackground(Color.WHITE);
             end.setForeground(Color.BLACK);
             end.setFocusPainted(false);
             end.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    endTurn();
+                    if (gameStarted) {
+                        endTurn();
+                    } else {
+                        gameStarted = true;
+                        end.setText("END TURN");
+                        frame.remove(reroll);
+                        frame.pack();
+                        frame.setLocationRelativeTo(null);
+                        if (randomizer.nextInt(2) == 0) {
+                            aiTurn();
+                        }
+                    }
                 }
             });
             end.addMouseListener(new MouseAdapter() {
@@ -71,18 +85,29 @@ public class DiceWars {
                 }
             });
 
+            reroll.setFont(new Font("Georgia", Font.BOLD, 40));
+            reroll.setBackground(Color.WHITE);
+            reroll.setForeground(Color.BLACK);
+            reroll.setFocusPainted(false);
+
             frame.setIconImage(icon.getImage());
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.add(panel);
+            frame.add(reroll, BorderLayout.NORTH);
             frame.add(end, BorderLayout.SOUTH);
             frame.add(playerScore, BorderLayout.WEST);
             frame.add(enemyScore, BorderLayout.EAST);
             frame.pack();
             frame.setLocationRelativeTo(null);
+            frame.setResizable(false);
             frame.setVisible(true);
 
             cells = panel.getCellMatrix();
         });
+    }
+
+    public static boolean getGameStarted() {
+        return gameStarted;
     }
 
     public static void setAttackState(boolean state, int row, int col) {
@@ -125,6 +150,8 @@ public class DiceWars {
         cells[attackingRow][attackingCol].setDiceNumber(1);
         cells[attackingRow][attackingCol].number.setForeground(Color.WHITE);
         attackingState = false;
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         if (DicePanel.getEnemyTerritories() == 0) {
             win();
         }
@@ -156,6 +183,8 @@ public class DiceWars {
         cells[attackingRow][attackingCol].setDiceNumber(1);
         //cells[attackingRow][attackingCol].number.setForeground(Color.WHITE);
         attackingState = false;
+        frame.pack();
+        frame.setLocationRelativeTo(null);
         if (DicePanel.getPlayerTerritories() == 0) {
             lose();
         }

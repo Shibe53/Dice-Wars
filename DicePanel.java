@@ -8,15 +8,26 @@ public class DicePanel extends JPanel {
 
     static final int ROWS = 6;
     static final int COLUMNS = 6;
+    
     static int playerTerritories = 0;
     static int enemyTerritories = 0;
     static CellPanel[][] cells = new CellPanel[ROWS][COLUMNS];
     Random randomizer = new Random();
+    GridBagConstraints gbc = new GridBagConstraints();
 
     public DicePanel() {
         setLayout(new GridBagLayout());
         setBackground(Color.GRAY);
         generateMap();
+
+        DiceWars.reroll.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                generateMap();
+                DiceWars.playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
+                DiceWars.enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
+            }
+        });
     }
 
     CellPanel[][] getCellMatrix() {
@@ -42,10 +53,12 @@ public class DicePanel extends JPanel {
     public void generateMap() {
         playerTerritories = 0;
         enemyTerritories = 0;
-        GridBagConstraints gbc = new GridBagConstraints();
 
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {
+                if (cells[row][col] != null) {
+                    this.remove(cells[row][col]);
+                }
                 cells[row][col] = new CellPanel(row, col);
                 cells[row][col].setBorder(new MatteBorder(2, 2, 2, 2, Color.BLACK));
                 gbc.gridx = col;
@@ -128,30 +141,36 @@ class CellPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
-                DiceWars.setAttackState(true, row, col);
-                number.setForeground(Color.PINK);
-            } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
-                DiceWars.attack(row, col);
+            if (DiceWars.getGameStarted()) {
+                if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
+                    DiceWars.setAttackState(true, row, col);
+                    number.setForeground(Color.PINK);
+                } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
+                    DiceWars.attack(row, col);
+                }
             }
         }
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            defaultBackground = getBackground();
-            if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
-                setBackground(new Color(119, 82, 168));
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
-            } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
-                setBackground(new Color(121, 204, 88));
-                setCursor(new Cursor(Cursor.HAND_CURSOR));
+            if (DiceWars.getGameStarted()) {
+                defaultBackground = getBackground();
+                if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
+                    setBackground(new Color(119, 82, 168));
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
+                    setBackground(new Color(121, 204, 88));
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                }
             }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            setBackground(defaultBackground);
-            setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            if (DiceWars.getGameStarted()) {
+                setBackground(defaultBackground);
+                setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            }
         }
     }
 }
