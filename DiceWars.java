@@ -14,7 +14,7 @@ public class DiceWars {
     static JFrame frame = new JFrame("Dice Wars");
     static ImageIcon icon = new ImageIcon("icon.png");
     DicePanel panel = new DicePanel();
-    static JButton end = new JButton("END TURN", icon);
+    static JButton end = new JButton("END TURN");
     static JLabel playerScore = new JLabel("0", JLabel.CENTER);
     static JLabel enemyScore = new JLabel("0", JLabel.CENTER);
 
@@ -103,6 +103,7 @@ public class DiceWars {
     }
 
     public static void attack(int enemyRow, int enemyCol) {
+
         int enemyRolls = 0;
         int playerRolls = 0;
         int enemyDice = cells[enemyRow][enemyCol].getDiceNumber();
@@ -129,7 +130,9 @@ public class DiceWars {
         }
     }
 
-    public static void attackAI(int attackedRow, int attackedCol) {
+    public static void attackAI(int attackingRow, int attackingCol,
+        int attackedRow, int attackedCol) {
+
         int enemyRolls = 0;
         int playerRolls = 0;
         int playerDice = cells[attackedRow][attackedCol].getDiceNumber();
@@ -142,7 +145,9 @@ public class DiceWars {
         }
 
         if (enemyRolls > playerRolls) {
-            cells[attackedRow][attackedCol].setDiceNumber(enemyDice - 1);
+            if (cells[attackedRow][attackedCol].getDiceNumber() != 1) {
+                cells[attackedRow][attackedCol].setDiceNumber(enemyDice - 1);
+            }
             cells[attackedRow][attackedCol].setIsPlayer(false);
             DicePanel.setPlayerTerritories(DicePanel.getPlayerTerritories() - 1);
             playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
@@ -191,6 +196,8 @@ public class DiceWars {
                 }
             }
         }
+
+        aiTurn();
     }
 
     public void endTurnAI() {
@@ -231,9 +238,53 @@ public class DiceWars {
     }
 
     public void aiTurn() {
-        while (true) {
-            // TODO
+
+        boolean attackableNeighbour = true;
+
+        while (attackableNeighbour) {
+            attackableNeighbour = false;
+            for (int i = 0; i < DicePanel.ROWS; i++) {
+                for (int j = 0; j < DicePanel.COLUMNS; j++) {
+                    if (!cells[i][j].getIsPlayer()) {
+                        int min = 9;
+                        int minI = 0;
+                        int minJ = 0;
+
+                        for (int neighbourI = Math.max(0, i - 1); 
+                            neighbourI <= Math.min(i + 1, cells.length - 1); neighbourI++) {
+                            for (int neighbourJ = Math.max(0, j - 1); 
+                                neighbourJ <= Math.min(j + 1, cells[0].length - 1); neighbourJ++) {
+                                if (neighbourI != i && neighbourJ != j
+                                    && cells[neighbourI][neighbourJ].getIsPlayer() 
+                                    && cells[neighbourI][neighbourJ].getDiceNumber() < min) {
+                                    min = cells[neighbourI][neighbourJ].getDiceNumber();
+                                    minI = neighbourI;
+                                    minJ = neighbourJ;
+                                }
+                            }
+                        }
+
+                        if (cells[i][j].getDiceNumber() >= min) {
+                            attackableNeighbour = true;
+                            cells[minI][minJ].setBackground(new Color(119, 82, 168));
+                            cells[i][j].setBackground(new Color(121, 204, 88));
+
+                            // TODO: swing timer thingy ~1000ms
+
+                            attackAI(i, j, minI, minJ);
+                            cells[i][j].setBackground(new Color(61, 153, 49));
+                            if (cells[minI][minJ].getIsPlayer()) {
+                                cells[minI][minJ].setBackground(new Color(100, 50, 168));
+                            }
+
+                            // TODO: swing timer thingy ~1000ms
+                        }
+                    }
+                }
+            }
         }
+
+        endTurnAI();
     }
 
     static void win() {
