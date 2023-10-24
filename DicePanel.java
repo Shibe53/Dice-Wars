@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.border.MatteBorder;
@@ -30,6 +31,7 @@ public class DicePanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 generateMap();
+                DiceWars.playSound(new File("Assets/dice_roll.wav"), false);
                 DiceWars.playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
                 DiceWars.enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
             }
@@ -176,12 +178,15 @@ class CellPanel extends JPanel {
                 if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
                     DiceWars.setAttackState(true, row, col);
                     number.setForeground(Color.PINK);
+                    DiceWars.playSound(new File("Assets/cell_click.wav"), false);
                 } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
                     DiceWars.attack(row, col);
+                    DiceWars.playSound(new File("Assets/cell_click.wav"), false);
                 } else if (DiceWars.getAttackState() && row == DiceWars.attackingRow 
                     && col == DiceWars.attackingCol) {
                     DiceWars.setAttackState(false);
                     number.setForeground(Color.WHITE);
+                    DiceWars.playSound(new File("Assets/cell_click.wav"), false);
                 }
             }
         }

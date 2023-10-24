@@ -9,6 +9,7 @@ import java.util.Random;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
@@ -20,7 +21,7 @@ import javax.swing.border.MatteBorder;
 public class DiceWars {
 
     static JFrame frame = new JFrame("Dice Wars");
-    static ImageIcon icon = new ImageIcon("dice_icon.png");
+    static ImageIcon icon = new ImageIcon("Assets/dice_icon.png");
     DicePanel panel = new DicePanel();
     static JButton end = new JButton("Play");
     static JButton reroll = new JButton("Reroll map");
@@ -33,6 +34,9 @@ public class DiceWars {
     static int attackingRow = 0;
     static int attackingCol = 0;
     static CellPanel[][] cells;
+
+    Clip diceMenu;
+    static Clip diceBG;
 
     /**
      * Constructor for the DiceWars class.
@@ -62,6 +66,7 @@ public class DiceWars {
                 public void actionPerformed(ActionEvent e) {
                     if (gameStarted) {
                         endTurn();
+                        playSound(new File("Assets/ai_turn.wav"), false);
                     } else {
                         gameStarted = true;
                         end.setText("END TURN");
@@ -71,7 +76,11 @@ public class DiceWars {
                         if (randomizer.nextInt(2) == 0) {
                             aiTurn();
                         }
-                        playSound(new File("dice_roll.wav"), false);
+                        diceBG = playSound(new File("Assets/dice_bg.wav"), true);
+                        FloatControl gainControl = 
+                            (FloatControl) diceBG.getControl(FloatControl.Type.MASTER_GAIN);
+                        gainControl.setValue(-10.0f);
+                        diceMenu.stop();
                     }
                 }
             });
@@ -114,7 +123,7 @@ public class DiceWars {
             frame.setResizable(false);
             frame.setVisible(true);
 
-            playSound(new File("dice_menu.wav"), true);
+            diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
 
             cells = panel.getCellMatrix();
         });
@@ -231,7 +240,6 @@ public class DiceWars {
             enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
         }
         cells[attackingRow][attackingCol].setDiceNumber(1);
-        attackingState = false;
         frame.pack();
         frame.setLocationRelativeTo(null);
         if (DicePanel.getPlayerTerritories() == 0) {
@@ -360,18 +368,32 @@ public class DiceWars {
                         if (cells[i][j].getDiceNumber() >= min) {
                             attackableNeighbour = true;
 
+                            // final int altMinI = minI;
+                            // final int altMinJ = minJ;
+                            // final int altI = i;
+                            // final int altJ = j;
+
                             cells[minI][minJ].setBackground(new Color(119, 82, 168));
                             cells[i][j].setBackground(new Color(121, 204, 88));
 
                             // TODO: swing timer thingy ~1000ms
 
+                            // SwingWorker worker = new SwingWorker<Object, String>() {
+
+                            //     @Override
+                            //     protected Object doInBackground() throws Exception {
+                            //         attackAI(altI, altJ, altMinI, altMinJ);
+                            //         Thread.sleep(1000);
+                            //         return null;
+                            //     }
+                            // };
                             attackAI(i, j, minI, minJ);
+                            // pause(1000);
 
                             cells[i][j].setBackground(new Color(61, 153, 49));
                             if (cells[minI][minJ].getIsPlayer()) {
                                 cells[minI][minJ].setBackground(new Color(100, 50, 168));
                             }
-
                         }
                     }
                 }
@@ -381,12 +403,20 @@ public class DiceWars {
         endTurnAI();
     }
 
+    /**
+     * Method for when the player wins the game (they control every territory).
+     */
     static void win() {
-        System.out.println("You won :)");
+        playSound(new File("Assets/dice_win.wav"), false);
+        diceBG.stop();
     }
 
+    /**
+     * Method for when the player loses the game (the opponent controls every territory).
+     */
     static void lose() {
-        System.out.println("You lost :(");
+        playSound(new File("Assets/dice_lose.wav"), false);
+        diceBG.stop();
     }
 
     /**
@@ -394,8 +424,9 @@ public class DiceWars {
      * 
      * @param file  sound file (.wav)
      * @param loop  true if the sound loops, false otherwise
+     * @return      clip of played sound
      */
-    public void playSound(File file, boolean loop) {
+    static Clip playSound(File file, boolean loop) {
         try {
             AudioInputStream audioInputStream = 
                 AudioSystem.getAudioInputStream(file.getAbsoluteFile());
@@ -406,10 +437,19 @@ public class DiceWars {
             } else {
                 clip.start();
             }
+            return clip;
         } catch (Exception ex) {
             throw new UnsupportedOperationException("Can't play audio :(");
         }
+
     }
+
+    // public void pause(int ms) {
+    //     Timer timer = new Timer(ms, null);
+    //     timer.setRepeats(false);
+    //     timer.start();
+    //     while (timer.isRunning()) {}
+    // }
 
     public static void main(String[] args) {
         new DiceWars();
