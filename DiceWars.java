@@ -203,7 +203,9 @@ public class DiceWars {
         frame.pack();
         frame.setLocationRelativeTo(null);
         if (DicePanel.getEnemyTerritories() == 0) {
-            win();
+            playSound(new File("Assets/dice_win.wav"), false);
+            diceBG.stop();
+            new DiceEnd(true);
         }
     }
 
@@ -243,7 +245,9 @@ public class DiceWars {
         frame.pack();
         frame.setLocationRelativeTo(null);
         if (DicePanel.getPlayerTerritories() == 0) {
-            lose();
+            playSound(new File("Assets/dice_lose.wav"), false);
+            diceBG.stop();
+            new DiceEnd(false);
         }
     }
 
@@ -401,22 +405,6 @@ public class DiceWars {
         }
 
         endTurnAI();
-    }
-
-    /**
-     * Method for when the player wins the game (they control every territory).
-     */
-    static void win() {
-        playSound(new File("Assets/dice_win.wav"), false);
-        diceBG.stop();
-    }
-
-    /**
-     * Method for when the player loses the game (the opponent controls every territory).
-     */
-    static void lose() {
-        playSound(new File("Assets/dice_lose.wav"), false);
-        diceBG.stop();
     }
 
     /**
