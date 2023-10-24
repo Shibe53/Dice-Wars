@@ -3,7 +3,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
 
+/**
+ * Shows the victory or defeat screen (accordingly).
+ */
 public class DiceEnd {
+
+    /**
+     * Constructor of class DiceEnd.
+     * @param win  true if the player won, false if the opponent won
+     */
     public DiceEnd(boolean win) {
         if (win) {
             winScreen();

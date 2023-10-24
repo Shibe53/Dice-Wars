@@ -22,9 +22,10 @@ public class DiceWars {
 
     static JFrame frame = new JFrame("Dice Wars");
     static ImageIcon icon = new ImageIcon("Assets/dice_icon.png");
-    DicePanel panel = new DicePanel();
-    static JButton end = new JButton("Play");
     static JButton reroll = new JButton("Reroll map");
+    static DicePanel gameArea = new DicePanel();
+    static DiceMenu menu = new DiceMenu();
+    static JButton end = new JButton("Play");
     static JLabel playerScore = new JLabel("0", JLabel.CENTER);
     static JLabel enemyScore = new JLabel("0", JLabel.CENTER);
 
@@ -35,16 +36,24 @@ public class DiceWars {
     static int attackingCol = 0;
     static CellPanel[][] cells;
 
-    Clip diceMenu;
+    static Clip diceMenu;
     static Clip diceBG;
 
     /**
      * Constructor for the DiceWars class.
      */
-    public DiceWars() {
-
+    private DiceWars() {
+        
         SwingUtilities.invokeLater(() -> {
-            panel.setBorder(new MatteBorder(6, 6, 6, 6, Color.BLACK));
+            frame.setIconImage(icon.getImage());
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.add(menu);
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+            diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
+
+            gameArea.setBorder(new MatteBorder(6, 6, 6, 6, Color.BLACK));
 
             playerScore.setFont(new Font("Roboto", Font.BOLD, 64));
             playerScore.setBorder(new EmptyBorder(7, 7, 7, 7));
@@ -110,23 +119,26 @@ public class DiceWars {
             reroll.setBackground(Color.WHITE);
             reroll.setForeground(Color.BLACK);
             reroll.setFocusPainted(false);
-
-            frame.setIconImage(icon.getImage());
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(panel);
-            frame.add(reroll, BorderLayout.NORTH);
-            frame.add(end, BorderLayout.SOUTH);
-            frame.add(playerScore, BorderLayout.WEST);
-            frame.add(enemyScore, BorderLayout.EAST);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setResizable(false);
-            frame.setVisible(true);
-
-            diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
-
-            cells = panel.getCellMatrix();
         });
+    }
+
+    /**
+     * Shows the main game screen of the game.
+     */
+    static void gameScreen() {
+        frame.remove(menu);
+        frame.add(gameArea);
+        frame.add(reroll, BorderLayout.NORTH);
+        frame.add(end, BorderLayout.SOUTH);
+        frame.add(playerScore, BorderLayout.WEST);
+        frame.add(enemyScore, BorderLayout.EAST);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
+
+        //diceMenu.stop();
+
+        cells = gameArea.getCellMatrix();
     }
 
     public static boolean getGameStarted() {
@@ -255,7 +267,7 @@ public class DiceWars {
      * End the player's turn, randomly assigning new dice throughout their territories.
      * Number of dice is based on player-controlled territories.
      */
-    public void endTurn() {
+    static void endTurn() {
         int newDice = DicePanel.getPlayerTerritories();
         boolean full = false;
         end.setEnabled(false);
@@ -299,7 +311,7 @@ public class DiceWars {
      * End the AI's turn, randomly assigning new dice throughout their territories.
      * Number of dice is based on AI-controlled territories.
      */
-    public void endTurnAI() {
+    static void endTurnAI() {
         int newDice = DicePanel.getEnemyTerritories();
         boolean full = false;
         end.setEnabled(true);
@@ -342,7 +354,7 @@ public class DiceWars {
      * Current implementation: checks player-controlled neighbours, attacks lowest
      * dice number that is smaller or equal to the attacking cell's dice number.
      */
-    public void aiTurn() {
+    static void aiTurn() {
 
         boolean attackableNeighbour = true;
 
