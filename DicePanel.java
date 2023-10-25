@@ -174,7 +174,7 @@ class CellPanel extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            if (DiceWars.getGameStarted()) {
+            if (DiceWars.getGameStarted() && DiceWars.getPlayerState()) {
                 if (isPlayer && !DiceWars.getAttackState() && dice > 1) {
                     DiceWars.setAttackState(true, row, col);
                     number.setForeground(Color.PINK);
@@ -193,7 +193,7 @@ class CellPanel extends JPanel {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            if (DiceWars.getGameStarted()) {
+            if (DiceWars.getGameStarted() && DiceWars.getPlayerState()) {
                 defaultBackground = getBackground();
                 if ((isPlayer && !DiceWars.getAttackState() && dice > 1) 
                     || (DiceWars.getAttackState() && row == DiceWars.attackingRow 
@@ -209,7 +209,7 @@ class CellPanel extends JPanel {
 
         @Override
         public void mouseExited(MouseEvent e) {
-            if (DiceWars.getGameStarted()) {
+            if (DiceWars.getGameStarted() && DiceWars.getPlayerState()) {
                 setBackground(defaultBackground);
                 setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             }

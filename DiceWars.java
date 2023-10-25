@@ -28,6 +28,7 @@ public class DiceWars {
     static JButton end = new JButton("Play");
     static JLabel playerScore = new JLabel("0", JLabel.CENTER);
     static JLabel enemyScore = new JLabel("0", JLabel.CENTER);
+    static JLabel turn = new JLabel("Player's Turn", JLabel.CENTER);
 
     static Random randomizer = new Random();
     static boolean attackingState = false;
@@ -35,6 +36,7 @@ public class DiceWars {
     static int attackingRow = 0;
     static int attackingCol = 0;
     static CellPanel[][] cells;
+    static boolean playerState = true;
 
     static Clip diceMenu;
     static Clip diceBG;
@@ -65,6 +67,11 @@ public class DiceWars {
             enemyScore.setForeground(new Color(61, 138, 30));
             enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
 
+            turn.setFont(new Font("Roboto", Font.BOLD, 42));
+            turn.setBorder(new EmptyBorder(7, 7, 7, 7));
+            turn.setForeground(new Color(100, 50, 168));
+            turn.setOpaque(true);
+
             end.setFont(new Font("Georgia", Font.BOLD, 36));
             end.setBorder(new EmptyBorder(5, 5, 5, 5));
             end.setBackground(Color.WHITE);
@@ -80,6 +87,7 @@ public class DiceWars {
                         gameStarted = true;
                         end.setText("END TURN");
                         frame.remove(reroll);
+                        frame.add(turn, BorderLayout.NORTH);
                         frame.pack();
                         frame.setLocationRelativeTo(null);
                         if (randomizer.nextInt(2) == 0) {
@@ -145,8 +153,8 @@ public class DiceWars {
         return gameStarted;
     }
 
-    public static void setAttackState(boolean state) {
-        attackingState = state;
+    public static boolean getPlayerState() {
+        return playerState;
     }
 
     /**
@@ -161,6 +169,10 @@ public class DiceWars {
         attackingState = state;
         attackingCol = col;
         attackingRow = row;
+    }
+
+    public static void setAttackState(boolean state) {
+        attackingState = state;
     }
 
     public static boolean getAttackState() {
@@ -245,9 +257,7 @@ public class DiceWars {
         }
 
         if (enemyRolls > playerRolls) {
-            if (cells[attackedRow][attackedCol].getDiceNumber() != 1) {
-                cells[attackedRow][attackedCol].setDiceNumber(enemyDice - 1);
-            }
+            cells[attackedRow][attackedCol].setDiceNumber(enemyDice - 1);
             cells[attackedRow][attackedCol].setIsPlayer(false);
             DicePanel.setPlayerTerritories(DicePanel.getPlayerTerritories() - 1);
             playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
@@ -256,6 +266,7 @@ public class DiceWars {
         cells[attackingRow][attackingCol].setDiceNumber(1);
         frame.pack();
         frame.setLocationRelativeTo(null);
+
         if (DicePanel.getPlayerTerritories() == 0) {
             playSound(new File("Assets/dice_lose.wav"), false);
             diceBG.stop();
@@ -270,7 +281,6 @@ public class DiceWars {
     static void endTurn() {
         int newDice = DicePanel.getPlayerTerritories();
         boolean full = false;
-        end.setEnabled(false);
 
         while (newDice > 0 && !full) {
             full = true;
@@ -314,7 +324,12 @@ public class DiceWars {
     static void endTurnAI() {
         int newDice = DicePanel.getEnemyTerritories();
         boolean full = false;
+
+        // TODO: (maybe for QoL) change label background color accordingly
         end.setEnabled(true);
+        playerState = true;
+        turn.setText("Player's Turn");
+        turn.setForeground(new Color(100, 50, 168));
 
         while (newDice > 0 && !full) {
             full = true;
@@ -356,67 +371,71 @@ public class DiceWars {
      */
     static void aiTurn() {
 
-        boolean attackableNeighbour = true;
+        end.setEnabled(false);
+        playerState = false;
+        turn.setText("Computer's Turn");
+        turn.setForeground(new Color(61, 153, 49));
 
-        while (attackableNeighbour) {
-            attackableNeighbour = false;
-            for (int i = 0; i < DicePanel.ROWS; i++) {
-                for (int j = 0; j < DicePanel.COLUMNS; j++) {
-                    if (!cells[i][j].getIsPlayer()) {
-                        int min = 9;
-                        int minI = 0;
-                        int minJ = 0;
+        SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 
-                        for (int neighbourI = Math.max(0, i - 1); 
-                            neighbourI <= Math.min(i + 1, cells.length - 1); neighbourI++) {
-                            for (int neighbourJ = Math.max(0, j - 1); 
-                                neighbourJ <= Math.min(j + 1, cells[0].length - 1); neighbourJ++) {
-                                if (neighbourI != i && neighbourJ != j
-                                    && cells[neighbourI][neighbourJ].getIsPlayer() 
-                                    && cells[neighbourI][neighbourJ].getDiceNumber() < min) {
-                                    min = cells[neighbourI][neighbourJ].getDiceNumber();
-                                    minI = neighbourI;
-                                    minJ = neighbourJ;
+            @Override
+            protected Object doInBackground() throws Exception {
+                boolean attackableNeighbour = true;
+
+                while (attackableNeighbour) {
+                    attackableNeighbour = false;
+                    for (int i = 0; i < DicePanel.ROWS; i++) {
+                        for (int j = 0; j < DicePanel.COLUMNS; j++) {
+                            if (!cells[i][j].getIsPlayer() && cells[i][j].getDiceNumber() > 1) {
+                                int min = 9;
+                                int minI = 0;
+                                int minJ = 0;
+
+                                for (int neighbourI = Math.max(0, i - 1); 
+                                    neighbourI <= Math.min(i + 1, cells.length - 1); neighbourI++) {
+                                    for (int neighbourJ = Math.max(0, j - 1); 
+                                        neighbourJ <= Math.min(j + 1, cells[0].length - 1); neighbourJ++) {
+                                        if (neighbourI != i && neighbourJ != j
+                                            && cells[neighbourI][neighbourJ].getIsPlayer() 
+                                            && cells[neighbourI][neighbourJ].getDiceNumber() < min) {
+                                            min = cells[neighbourI][neighbourJ].getDiceNumber();
+                                            minI = neighbourI;
+                                            minJ = neighbourJ;
+                                        }
+                                    }
                                 }
-                            }
-                        }
 
-                        if (cells[i][j].getDiceNumber() >= min) {
-                            attackableNeighbour = true;
+                                if (cells[i][j].getDiceNumber() >= min) {
+                                    attackableNeighbour = true;
 
-                            // final int altMinI = minI;
-                            // final int altMinJ = minJ;
-                            // final int altI = i;
-                            // final int altJ = j;
+                                    Thread.sleep(700);
 
-                            cells[minI][minJ].setBackground(new Color(119, 82, 168));
-                            cells[i][j].setBackground(new Color(121, 204, 88));
+                                    // TODO: MAKE THESE COLOURS CONSTANTS
+                                    cells[minI][minJ].setBackground(new Color(119, 82, 168));
+                                    cells[i][j].setBackground(new Color(121, 204, 88));
 
-                            // TODO: swing timer thingy ~1000ms
+                                    Thread.sleep(1000);
 
-                            // SwingWorker worker = new SwingWorker<Object, String>() {
+                                    attackAI(i, j, minI, minJ);
 
-                            //     @Override
-                            //     protected Object doInBackground() throws Exception {
-                            //         attackAI(altI, altJ, altMinI, altMinJ);
-                            //         Thread.sleep(1000);
-                            //         return null;
-                            //     }
-                            // };
-                            attackAI(i, j, minI, minJ);
-                            // pause(1000);
+                                    cells[i][j].setBackground(new Color(61, 153, 49));
+                                    if (cells[minI][minJ].getIsPlayer()) {
+                                        cells[minI][minJ].setBackground(new Color(100, 50, 168));
+                                    }
 
-                            cells[i][j].setBackground(new Color(61, 153, 49));
-                            if (cells[minI][minJ].getIsPlayer()) {
-                                cells[minI][minJ].setBackground(new Color(100, 50, 168));
+                                    Thread.sleep(300);
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
 
-        endTurnAI();
+                endTurnAI();
+                return null;
+            }
+        };
+
+        worker.execute();
     }
 
     /**
@@ -443,13 +462,6 @@ public class DiceWars {
         }
 
     }
-
-    // public void pause(int ms) {
-    //     Timer timer = new Timer(ms, null);
-    //     timer.setRepeats(false);
-    //     timer.start();
-    //     while (timer.isRunning()) {}
-    // }
 
     public static void main(String[] args) {
         new DiceWars();
