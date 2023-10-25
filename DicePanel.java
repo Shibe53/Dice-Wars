@@ -12,6 +12,10 @@ public class DicePanel extends JPanel {
 
     static final int ROWS = 6;
     static final int COLUMNS = 6;
+    static final Color PLAYER_COLOR = new Color(100, 50, 168);
+    static final Color ENEMY_COLOR = new Color(61, 153, 49);
+    static final Color LIGHT_PLAYER_COLOR = new Color(119, 82, 168);
+    static final Color LIGHT_ENEMY_COLOR = new Color(121, 204, 88);
     
     static int playerTerritories = 0;
     static int enemyTerritories = 0;
@@ -149,14 +153,14 @@ class CellPanel extends JPanel {
         isPlayer = is;
         if (isPlayer) {
             number.setForeground(Color.WHITE);
-            setBackground(new Color(100, 50, 168));
-            defaultBackground = new Color(100, 50, 168);
+            setBackground(DicePanel.PLAYER_COLOR);
+            defaultBackground = DicePanel.PLAYER_COLOR;
             DicePanel.setPlayerTerritories(DicePanel.getPlayerTerritories() + 1);
 
         } else {
             number.setForeground(Color.BLACK);
-            setBackground(new Color(61, 153, 49));
-            defaultBackground = new Color(61, 153, 49);
+            setBackground(DicePanel.ENEMY_COLOR);
+            defaultBackground = DicePanel.ENEMY_COLOR;
             DicePanel.setEnemyTerritories(DicePanel.getEnemyTerritories() + 1);
         }
     }
@@ -198,10 +202,10 @@ class CellPanel extends JPanel {
                 if ((isPlayer && !DiceWars.getAttackState() && dice > 1) 
                     || (DiceWars.getAttackState() && row == DiceWars.attackingRow 
                     && col == DiceWars.attackingCol)) {
-                    setBackground(new Color(119, 82, 168));
+                    setBackground(DicePanel.LIGHT_PLAYER_COLOR);
                     setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else if (!isPlayer && DiceWars.getAttackState() && DiceWars.canAttack(row, col)) {
-                    setBackground(new Color(121, 204, 88));
+                    setBackground(DicePanel.LIGHT_ENEMY_COLOR);
                     setCursor(new Cursor(Cursor.HAND_CURSOR));
                 }
             }

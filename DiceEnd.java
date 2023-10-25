@@ -21,6 +21,7 @@ public class DiceEnd {
     }
 
     private void winScreen() {
+        // TODO: copy-paste code from loseScreen() with text and color changes
 
     }
 
@@ -44,7 +45,19 @@ public class DiceEnd {
         c.anchor = GridBagConstraints.PAGE_START;
         dialog.add(label, c);
 
+        // TODO: design buttons (might make them the same as the main menu - more or less)
         JButton play = new JButton("Play again");
+
+        play.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // TODO: figure out how to start game again (might have to make a function in
+                // like DicePanel that reinitializes everything - probably the case)
+                DiceWars.frame.dispose();
+                new DiceWars();
+            }
+        });
 
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
@@ -57,7 +70,7 @@ public class DiceEnd {
 
         JButton exit = new JButton("Exit");
 
-        exit.addActionListener((ActionListener) new ActionListener() {
+        exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 DiceWars.frame.dispose();

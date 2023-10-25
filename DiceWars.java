@@ -44,7 +44,7 @@ public class DiceWars {
     /**
      * Constructor for the DiceWars class.
      */
-    private DiceWars() {
+    public DiceWars() {
         
         SwingUtilities.invokeLater(() -> {
             frame.setIconImage(icon.getImage());
@@ -59,17 +59,17 @@ public class DiceWars {
 
             playerScore.setFont(new Font("Roboto", Font.BOLD, 64));
             playerScore.setBorder(new EmptyBorder(7, 7, 7, 7));
-            playerScore.setForeground(new Color(100, 50, 168));
+            playerScore.setForeground(DicePanel.PLAYER_COLOR);
             playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
 
             enemyScore.setFont(new Font("Roboto", Font.BOLD, 64));
             enemyScore.setBorder(new EmptyBorder(7, 7, 7, 7));
-            enemyScore.setForeground(new Color(61, 138, 30));
+            enemyScore.setForeground(DicePanel.ENEMY_COLOR);
             enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
 
             turn.setFont(new Font("Roboto", Font.BOLD, 42));
             turn.setBorder(new EmptyBorder(7, 7, 7, 7));
-            turn.setForeground(new Color(100, 50, 168));
+            turn.setForeground(DicePanel.PLAYER_COLOR);
             turn.setOpaque(true);
 
             end.setFont(new Font("Georgia", Font.BOLD, 36));
@@ -325,11 +325,10 @@ public class DiceWars {
         int newDice = DicePanel.getEnemyTerritories();
         boolean full = false;
 
-        // TODO: (maybe for QoL) change label background color accordingly
         end.setEnabled(true);
         playerState = true;
         turn.setText("Player's Turn");
-        turn.setForeground(new Color(100, 50, 168));
+        turn.setForeground(DicePanel.PLAYER_COLOR);
 
         while (newDice > 0 && !full) {
             full = true;
@@ -374,7 +373,7 @@ public class DiceWars {
         end.setEnabled(false);
         playerState = false;
         turn.setText("Computer's Turn");
-        turn.setForeground(new Color(61, 153, 49));
+        turn.setForeground(DicePanel.ENEMY_COLOR);
 
         SwingWorker<Object, String> worker = new SwingWorker<Object, String>() {
 
@@ -391,16 +390,16 @@ public class DiceWars {
                                 int minI = 0;
                                 int minJ = 0;
 
-                                for (int neighbourI = Math.max(0, i - 1); 
-                                    neighbourI <= Math.min(i + 1, cells.length - 1); neighbourI++) {
-                                    for (int neighbourJ = Math.max(0, j - 1); 
-                                        neighbourJ <= Math.min(j + 1, cells[0].length - 1); neighbourJ++) {
-                                        if (neighbourI != i && neighbourJ != j
-                                            && cells[neighbourI][neighbourJ].getIsPlayer() 
-                                            && cells[neighbourI][neighbourJ].getDiceNumber() < min) {
-                                            min = cells[neighbourI][neighbourJ].getDiceNumber();
-                                            minI = neighbourI;
-                                            minJ = neighbourJ;
+                                for (int neighborI = Math.max(0, i - 1); 
+                                    neighborI <= Math.min(i + 1, cells.length - 1); neighborI++) {
+                                    for (int neighborJ = Math.max(0, j - 1); neighborJ
+                                        <= Math.min(j + 1, cells[0].length - 1); neighborJ++) {
+                                        if (neighborI != i && neighborJ != j
+                                            && cells[neighborI][neighborJ].getIsPlayer() 
+                                            && cells[neighborI][neighborJ].getDiceNumber() < min) {
+                                            min = cells[neighborI][neighborJ].getDiceNumber();
+                                            minI = neighborI;
+                                            minJ = neighborJ;
                                         }
                                     }
                                 }
@@ -410,17 +409,16 @@ public class DiceWars {
 
                                     Thread.sleep(700);
 
-                                    // TODO: MAKE THESE COLOURS CONSTANTS
-                                    cells[minI][minJ].setBackground(new Color(119, 82, 168));
-                                    cells[i][j].setBackground(new Color(121, 204, 88));
+                                    cells[minI][minJ].setBackground(DicePanel.LIGHT_PLAYER_COLOR);
+                                    cells[i][j].setBackground(DicePanel.LIGHT_ENEMY_COLOR);
 
                                     Thread.sleep(1000);
 
                                     attackAI(i, j, minI, minJ);
 
-                                    cells[i][j].setBackground(new Color(61, 153, 49));
+                                    cells[i][j].setBackground(DicePanel.ENEMY_COLOR);
                                     if (cells[minI][minJ].getIsPlayer()) {
-                                        cells[minI][minJ].setBackground(new Color(100, 50, 168));
+                                        cells[minI][minJ].setBackground(DicePanel.PLAYER_COLOR);
                                     }
 
                                     Thread.sleep(300);
@@ -460,7 +458,6 @@ public class DiceWars {
         } catch (Exception ex) {
             throw new UnsupportedOperationException("Can't play audio :(");
         }
-
     }
 
     public static void main(String[] args) {
