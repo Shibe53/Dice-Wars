@@ -1,3 +1,5 @@
+package dice_wars;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
