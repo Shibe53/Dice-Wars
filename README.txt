@@ -1,0 +1,1 @@
+You an play the game by running DiceWars.jar. The source codes is in the "src" folder, classes are in the "bin" folder, and all of the assets used in the app are in the "assets" folder.
