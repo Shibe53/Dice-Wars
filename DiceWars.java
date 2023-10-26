@@ -287,6 +287,7 @@ public class DiceWars {
 
         if (DicePanel.getPlayerTerritories() == 0) {
             playSound(new File("Assets/dice_lose.wav"), false);
+            cells[attackingRow][attackingCol].setBackground(DicePanel.ENEMY_COLOR);
             diceBG.stop();
             new DiceEnd(false);
         }
