@@ -20,24 +20,22 @@ import javax.swing.border.MatteBorder;
  */
 public class DiceWars {
 
-    static JFrame frame = new JFrame("Dice Wars");
-    static ImageIcon icon = new ImageIcon("Assets/dice_icon.png");
-    static JButton reroll = new JButton("Reroll map");
-    static DicePanel gameArea = new DicePanel();
-    static DiceMenu menu = new DiceMenu();
-    static JButton end = new JButton("Play");
-    static JLabel playerScore = new JLabel("0", JLabel.CENTER);
-    static JLabel enemyScore = new JLabel("0", JLabel.CENTER);
-    static JLabel turn = new JLabel("Player's Turn", JLabel.CENTER);
-
-    static Random randomizer = new Random();
-    static boolean attackingState = false;
-    static boolean gameStarted = false;
-    static int attackingRow = 0;
-    static int attackingCol = 0;
+    static JFrame frame;
+    static ImageIcon icon;
+    static JButton reroll;
+    static DicePanel gameArea;
+    static DiceMenu menu;
+    static JButton end;
+    static JLabel playerScore;
+    static JLabel enemyScore;
+    static JLabel turn;
+    static Random randomizer;
+    static boolean attackingState;
+    static boolean gameStarted;
+    static int attackingRow;
+    static int attackingCol;
     static CellPanel[][] cells;
-    static boolean playerState = true;
-
+    static boolean playerState;
     static Clip diceMenu;
     static Clip diceBG;
 
@@ -45,89 +43,109 @@ public class DiceWars {
      * Constructor for the DiceWars class.
      */
     public DiceWars() {
-        
         SwingUtilities.invokeLater(() -> {
-            frame.setIconImage(icon.getImage());
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(menu);
-            frame.pack();
-            frame.setLocationRelativeTo(null);
-            frame.setVisible(true);
-            diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
-
-            gameArea.setBorder(new MatteBorder(6, 6, 6, 6, Color.BLACK));
-
-            playerScore.setFont(new Font("Roboto", Font.BOLD, 64));
-            playerScore.setBorder(new EmptyBorder(7, 7, 7, 7));
-            playerScore.setForeground(DicePanel.PLAYER_COLOR);
-            playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
-
-            enemyScore.setFont(new Font("Roboto", Font.BOLD, 64));
-            enemyScore.setBorder(new EmptyBorder(7, 7, 7, 7));
-            enemyScore.setForeground(DicePanel.ENEMY_COLOR);
-            enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
-
-            turn.setFont(new Font("Roboto", Font.BOLD, 42));
-            turn.setBorder(new EmptyBorder(7, 7, 7, 7));
-            turn.setForeground(DicePanel.PLAYER_COLOR);
-            turn.setOpaque(true);
-
-            end.setFont(new Font("Georgia", Font.BOLD, 36));
-            end.setBorder(new EmptyBorder(5, 5, 5, 5));
-            end.setBackground(Color.WHITE);
-            end.setForeground(Color.BLACK);
-            end.setFocusPainted(false);
-            end.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if (gameStarted) {
-                        endTurn();
-                        playSound(new File("Assets/ai_turn.wav"), false);
-                    } else {
-                        gameStarted = true;
-                        end.setText("END TURN");
-                        frame.remove(reroll);
-                        frame.add(turn, BorderLayout.NORTH);
-                        frame.pack();
-                        frame.setLocationRelativeTo(null);
-                        if (randomizer.nextInt(2) == 0) {
-                            aiTurn();
-                        }
-                        diceBG = playSound(new File("Assets/dice_bg.wav"), true);
-                        FloatControl gainControl = 
-                            (FloatControl) diceBG.getControl(FloatControl.Type.MASTER_GAIN);
-                        gainControl.setValue(-10.0f);
-                        diceMenu.stop();
-                    }
-                }
-            });
-            end.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseEntered(MouseEvent e) {
-                    if (end.isEnabled()) {
-                        end.setBackground(Color.BLACK);
-                        end.setForeground(Color.WHITE);
-                    }
-                }
-
-                @Override
-                public void mouseExited(MouseEvent e) {
-                    end.setBackground(Color.WHITE);
-                    end.setForeground(Color.BLACK);
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    end.setBackground(Color.WHITE);
-                    end.setForeground(Color.BLACK);
-                }
-            });
-
-            reroll.setFont(new Font("Georgia", Font.BOLD, 40));
-            reroll.setBackground(Color.WHITE);
-            reroll.setForeground(Color.BLACK);
-            reroll.setFocusPainted(false);
+            initializeGUI();
         });
+    }
+
+    private void initializeGUI() {
+        icon = new ImageIcon("Assets/dice_icon.png");
+        reroll = new JButton("Reroll map");
+        gameArea = new DicePanel();
+        menu = new DiceMenu();
+        end = new JButton("Play");
+        playerScore = new JLabel("0", JLabel.CENTER);
+        enemyScore = new JLabel("0", JLabel.CENTER);
+        turn = new JLabel("Player's Turn", JLabel.CENTER);
+        frame = new JFrame("Dice Wars");
+
+        randomizer = new Random();
+        attackingState = false;
+        gameStarted = false;
+        attackingRow = 0;
+        attackingCol = 0;
+        playerState = true;
+
+        frame.setIconImage(icon.getImage());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(menu);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
+
+        gameArea.setBorder(new MatteBorder(6, 6, 6, 6, Color.BLACK));
+
+        playerScore.setFont(new Font("Roboto", Font.BOLD, 64));
+        playerScore.setBorder(new EmptyBorder(7, 7, 7, 7));
+        playerScore.setForeground(DicePanel.PLAYER_COLOR);
+        playerScore.setText(String.valueOf(DicePanel.getPlayerTerritories()));
+
+        enemyScore.setFont(new Font("Roboto", Font.BOLD, 64));
+        enemyScore.setBorder(new EmptyBorder(7, 7, 7, 7));
+        enemyScore.setForeground(DicePanel.ENEMY_COLOR);
+        enemyScore.setText(String.valueOf(DicePanel.getEnemyTerritories()));
+
+        turn.setFont(new Font("Roboto", Font.BOLD, 42));
+        turn.setBorder(new EmptyBorder(7, 7, 7, 7));
+        turn.setForeground(DicePanel.PLAYER_COLOR);
+        turn.setOpaque(true);
+
+        end.setFont(new Font("Georgia", Font.BOLD, 36));
+        end.setBorder(new EmptyBorder(5, 5, 5, 5));
+        end.setBackground(Color.WHITE);
+        end.setForeground(Color.BLACK);
+        end.setFocusPainted(false);
+        end.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (gameStarted) {
+                    endTurn();
+                    playSound(new File("Assets/ai_turn.wav"), false);
+                } else {
+                    gameStarted = true;
+                    end.setText("END TURN");
+                    frame.remove(reroll);
+                    frame.add(turn, BorderLayout.NORTH);
+                    frame.pack();
+                    frame.setLocationRelativeTo(null);
+                    if (randomizer.nextInt(2) == 0) {
+                        aiTurn();
+                    }
+                    diceBG = playSound(new File("Assets/dice_bg.wav"), true);
+                    FloatControl gainControl = 
+                        (FloatControl) diceBG.getControl(FloatControl.Type.MASTER_GAIN);
+                    gainControl.setValue(-10.0f);
+                    diceMenu.stop();
+                }
+            }
+        });
+        end.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (end.isEnabled()) {
+                    end.setBackground(Color.BLACK);
+                    end.setForeground(Color.WHITE);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                end.setBackground(Color.WHITE);
+                end.setForeground(Color.BLACK);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                end.setBackground(Color.WHITE);
+                end.setForeground(Color.BLACK);
+            }
+        });
+
+        reroll.setFont(new Font("Georgia", Font.BOLD, 40));
+        reroll.setBackground(Color.WHITE);
+        reroll.setForeground(Color.BLACK);
+        reroll.setFocusPainted(false);
     }
 
     /**
@@ -394,7 +412,7 @@ public class DiceWars {
                                     neighborI <= Math.min(i + 1, cells.length - 1); neighborI++) {
                                     for (int neighborJ = Math.max(0, j - 1); neighborJ
                                         <= Math.min(j + 1, cells[0].length - 1); neighborJ++) {
-                                        if (neighborI != i && neighborJ != j
+                                        if (!(neighborI == i && neighborJ == j)
                                             && cells[neighborI][neighborJ].getIsPlayer() 
                                             && cells[neighborI][neighborJ].getDiceNumber() < min) {
                                             min = cells[neighborI][neighborJ].getDiceNumber();
@@ -402,6 +420,10 @@ public class DiceWars {
                                             minJ = neighborJ;
                                         }
                                     }
+                                }
+
+                                if (playerState) {
+                                    return null;
                                 }
 
                                 if (cells[i][j].getDiceNumber() >= min) {

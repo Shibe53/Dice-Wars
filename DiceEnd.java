@@ -52,8 +52,6 @@ public class DiceEnd {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // TODO: figure out how to start game again (might have to make a function in
-                // like DicePanel that reinitializes everything - probably the case)
                 DiceWars.frame.dispose();
                 new DiceWars();
             }
