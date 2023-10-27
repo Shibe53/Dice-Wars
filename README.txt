@@ -10,7 +10,7 @@
 
 =================================== HOW TO PLAY ===================================
 
-Press the "Vs Computer" button to play the game against an AI. A map will be generated randomly, shown in a grid-like pattern.
+Press the "Vs. Computer" button to play the game against an AI. A map will be generated randomly, shown in a grid-like pattern.
 The scores on the left and right represent the number of territories of each side. The player-controlled territories are shown in purple, 
 while the computer-controlled ones are green. Before the game starts, the player can "reroll" the map by clicking on the button at the top of the screen.
 

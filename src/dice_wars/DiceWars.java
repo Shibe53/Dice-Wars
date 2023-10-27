@@ -73,6 +73,7 @@ public class DiceWars {
         frame.add(menu);
         frame.pack();
         frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
         frame.setVisible(true);
         diceMenu = playSound(new File("Assets/dice_menu.wav"), true);
 
@@ -162,7 +163,6 @@ public class DiceWars {
         frame.add(enemyScore, BorderLayout.EAST);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
 
         //diceMenu.stop();
 

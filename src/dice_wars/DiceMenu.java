@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
 /**
@@ -49,7 +48,8 @@ public class DiceMenu extends JPanel {
         howToButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(DiceWars.frame, howtoplay);
+                JOptionPane.showMessageDialog(DiceWars.frame, howtoplay, 
+                    "How To Play Dice Wars", JOptionPane.PLAIN_MESSAGE);
             }
         });
 
@@ -79,8 +79,8 @@ public class DiceMenu extends JPanel {
     private JButton createButton(String text, String imageName) {
         JButton button = new JButton(text);
 
-        button.setPreferredSize(new Dimension(200, 50));
-        button.setFont(new Font("Arial", Font.BOLD, 22));
+        button.setPreferredSize(new Dimension(200, 60));
+        button.setFont(new Font("Arial", Font.BOLD, 24));
         button.setFocusPainted(false);
         button.setBackground(DicePanel.PLAYER_COLOR);
         button.setForeground(Color.WHITE);
@@ -91,7 +91,7 @@ public class DiceMenu extends JPanel {
             public void mouseEntered(MouseEvent e) {
                 button.setBackground(Color.WHITE);
                 button.setForeground(Color.BLACK);
-                button.setPreferredSize(new Dimension(220, 60));
+                button.setPreferredSize(new Dimension(230, 60));
                 try {
                     BufferedImage image = ImageIO.read(new File(imageName));
                     button.setIcon(new ImageIcon(image));
@@ -105,13 +105,8 @@ public class DiceMenu extends JPanel {
                 button.setBackground(DicePanel.PLAYER_COLOR);
                 button.setBorder(new MatteBorder(3, 3, 3, 3, DicePanel.LIGHT_ENEMY_COLOR));
                 button.setForeground(Color.WHITE);
-                button.setPreferredSize(new Dimension(200, 50));
+                button.setPreferredSize(new Dimension(200, 60));
                 button.setIcon(null);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                button.setBackground(Color.BLACK);
             }
         });
 
@@ -123,7 +118,7 @@ public class DiceMenu extends JPanel {
         return new Dimension(600, 600);
     }
 
-    String howtoplay = "Press the \"Vs Computer\" button to play the game against an AI. \n"
+    String howtoplay = "Press the \"Vs. Computer\" button to play the game against an AI. \n"
             + "A map will be generated randomly, shown in a grid-like pattern.\n"
             + "The scores on the left and right represent the number of territories of each side.\n"
             + "The player-controlled territories are shown in purple, \n"
