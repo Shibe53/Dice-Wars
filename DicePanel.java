@@ -62,7 +62,7 @@ public class DicePanel extends JPanel {
      * Generates a grid made of CellPanels the represent territories.
      * 
      * The territories are randomly (and fairly) assigned to either the player or the opponent.
-     * Each territory has a random number of dice, from 1 to 4.s
+     * Each territory has a random number of dice, from 1 to 4.
      */
     public void generateMap() {
         playerTerritories = 0;

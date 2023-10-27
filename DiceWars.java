@@ -439,7 +439,7 @@ public class DiceWars {
             }
             return clip;
         } catch (Exception ex) {
-            throw new UnsupportedOperationException("Can't play audio :(");
+            throw new UnsupportedOperationException("Can't play audio ;-;");
         }
 
     }
